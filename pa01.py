@@ -72,16 +72,18 @@ def main():
     with open(infile, 'rb') as f:
         raw = f.read()
 
-    # character count includes all characters, including newlines
-    char_count = len(raw)
+    word_bytes = size // 8
+    pad_len = (word_bytes - (len(raw) % word_bytes)) % word_bytes
+    padded = raw + b'X' * pad_len
 
-    # text for output removes newlines
-    text = raw.decode('ascii')
-    printable = text.replace('\n', '')
-    for i in range(0, len(printable), 80):
-        print(printable[i:i + 80])
+    text = padded.decode('ascii')
+
+    print()
+    for i in range(0, len(text), 80):
+        print(text[i:i + 80])
 
     checksum = compute_checksum(raw, size)
+    char_count = len(padded)
     print(f"{size:2d} bit checksum is {checksum:8x} for all {char_count:4d} chars")
 
 
